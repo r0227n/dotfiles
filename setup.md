@@ -5,7 +5,7 @@
 ## 管理元
 
 - ランタイム: `programs/mise/config.toml` に明示したバージョンを mise で導入。
-- アプリ・一般 CLI・フォント: `Brewfile` に記載。Tuist は公式 Tap の `4.155.3` を使用。
+- アプリ・一般 CLI・フォント: `Brewfile` に記載。
 - 設定: Home Manager で生成・リンク。Neovim は既存の LazyVim 設定を配置。
 - Nix の例外: Home Manager 自身、`nil`、`nix-direnv`、設定生成に必要な依存。
 
@@ -48,7 +48,7 @@ Home Manager の既存ファイルへのバックアップ接尾辞は `before-d
 | Docker ボリューム / シミュレータの実データ / 会話履歴 | dotfiles とは別にバックアップ |
 | macOS の画面収録・アクセシビリティなど | システム設定で個別に承認 |
 
-Hermes / hermes-agent、Appium、Deno、idb-companion、CuaDriver、HHKB キーマップ変更ツール、Raycast は管理対象外です。
+管理対象外の一覧は [README.md](README.md#管理対象外) を参照してください。
 これらが残っていても正常です。`brew bundle cleanup` で一覧外のアプリを削除しないでください。
 
 ## 更新とロールバック
@@ -61,5 +61,4 @@ Homebrew の更新は Home Manager の世代切り替えでは戻らないため
 
 - [Homebrew Bundle](https://docs.brew.sh/Brew-Bundle-and-Brewfile)
 - [mise configuration](https://mise.jdx.dev/configuration.html)
-- [Tuist installation](https://tuist.dev/en/docs/guides/install-tuist)
 - [Home Manager](https://nix-community.github.io/home-manager/)

@@ -139,16 +139,21 @@ class ManagementPolicyTests(unittest.TestCase):
             "hermes", "hermes-agent", "appium", "deno", "idb-companion",
             "cua-driver", "hhkb", "hhkb-keymap-tool", "raycast",
             "flutter", "bun", "node", "rust", "python", "zig",
+            "lazygit", "lua-language-server", "typescript-language-server",
+            "vscode-langservers-extracted", "block-goose-cli", "opencode",
+            "tuist/tuist/tuist@4.155.3", "xcodegen", "1password-cli",
         }
         self.assertFalse(excluded.intersection(entries))
         self.assertEqual(len(entries), len(set(entries)))
         self.assertIn("mise", entries)
+        self.assertNotIn('tap "tuist/tuist"', (ROOT / "Brewfile").read_text())
 
     def test_runtime_versions_are_explicit_and_not_rolling(self):
         content = (ROOT / "programs/mise/config.toml").read_text()
         tools = content.split("[tools]", 1)[1].split("[plugins]", 1)[0]
         pins = dict(re.findall(r'^(\w+) = "([^"]+)"', tools, re.M))
         self.assertTrue({"flutter", "bun", "node", "rust"}.issubset(pins))
+        self.assertNotIn("zig", pins)
         for version in pins.values():
             self.assertRegex(version, r"^\d+\.\d+\.\d+$")
 

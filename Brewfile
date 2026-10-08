@@ -1,8 +1,7 @@
 # Applications and general CLI tools; runtime versions belong to mise.
-# Unmanaged: Hermes, Appium, Deno, idb-companion, CuaDriver, HHKB and Raycast.
+# Unmanaged tools are listed in README.md; do not add them here.
 # Never use brew bundle cleanup with this file.
 tap "coderabbitai/tap"
-tap "tuist/tuist"
 
 # Shell and everyday CLI tools
 brew "mise"
@@ -22,7 +21,6 @@ brew "yq"
 brew "htop"
 brew "btop"
 brew "gh"
-brew "lazygit"
 brew "direnv"
 brew "tlrc"
 brew "starship"
@@ -34,10 +32,7 @@ brew "m-cli"
 # Editor, language servers and formatters (Dart comes with Flutter)
 brew "neovim"
 brew "tree-sitter-cli"
-brew "lua-language-server"
 brew "rust-analyzer"
-brew "typescript-language-server"
-brew "vscode-langservers-extracted"
 brew "stylua"
 brew "nixfmt"
 brew "shellcheck"
@@ -45,7 +40,6 @@ brew "prettier"
 
 # Development, AI and media tools discovered on this Mac
 brew "agent-browser"
-brew "block-goose-cli"
 brew "cmake"
 brew "cargo-about"
 brew "cargo-edit"
@@ -59,20 +53,16 @@ brew "googleworkspace-cli"
 brew "grpc"
 brew "librsvg"
 brew "ollama"
-brew "opencode"
 brew "protobuf"
 brew "sox"
 brew "swift-format"
 brew "swift-protobuf"
 brew "swiftformat"
 brew "swiftlint"
-brew "tuist/tuist/tuist@4.155.3"
 brew "uv"
-brew "xcodegen"
 brew "yt-dlp"
 
 # Desktop and CLI applications distributed as casks.
-cask "1password-cli"
 cask "android-studio"
 cask "chatgpt"
 cask "claude-code"

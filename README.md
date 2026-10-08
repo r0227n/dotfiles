@@ -6,7 +6,7 @@ Apple Silicon macOS 向け。**ランタイムは mise、アプリ・一般 CLI 
 
 | 対象 | 定義 |
 | --- | --- |
-| Flutter / Bun / Node.js / Rust / Python / Zig のバージョン | `programs/mise/config.toml` |
+| Flutter / Bun / Node.js / Rust / Python のバージョン | `programs/mise/config.toml` |
 | アプリ、一般 CLI、mise 本体、エディタ、フォント | `Brewfile` |
 | Xcode / Apple Developer（任意） | `Brewfile.mas` |
 | Zsh / Git / Neovim / WezTerm / Claude などの設定 | `home.nix`、`programs/`、`modules/` |
@@ -24,8 +24,14 @@ Brewfile は導入対象を宣言するファイルで、Homebrew の全バー�
 - CuaDriver
 - HHKB キーマップ変更ツール
 - Raycast
+- lazygit（設定・独自エイリアス・独自キーバインドを含む）
+- lua-language-server / typescript-language-server / vscode-langservers-extracted
+- block-goose-cli / opencode
+- Tuist（tuist/tuist Tap を含む）/ xcodegen
+- 1password-cli
+- Zig
 
-これらの導入・設定・削除は自動化しません。セットアップや更新は `brew bundle cleanup` を実行しません。
+これらの導入・設定・削除は自動化しません。除外した LSP は LazyVim の既定設定からも起動しないようにしています。セットアップや更新は `brew bundle cleanup` を実行しません。
 他ツールの依存として Homebrew が Node.js・Python・Deno などを導入する場合はあります。利用するランタイムは mise の shims を優先します。
 
 ## セットアップ

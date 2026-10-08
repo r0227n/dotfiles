@@ -100,25 +100,4 @@
     prompt = "enabled";
     pager = "delta";
   };
-
-  # lazygit設定
-  programs.lazygit = {
-    enable = true;
-    package = null;
-    settings = {
-      gui = {
-        theme = {
-          selectedLineBgColor = [ "reverse" ];
-          selectedRangeBgColor = [ "reverse" ];
-        };
-        nerdFontsVersion = "3";
-      };
-      git = {
-        paging = {
-          colorArg = "always";
-          pager = "delta --dark --paging=never";
-        };
-      };
-    };
-  };
 }

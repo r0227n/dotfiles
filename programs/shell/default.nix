@@ -17,7 +17,6 @@
       gp = "git push";
       gl = "git log --oneline --graph --all --decorate";
       gd = "git diff";
-      lg = "lazygit";
 
       # Neovim
       v = "nvim";
