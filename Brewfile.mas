@@ -1,0 +1,4 @@
+# Optional: sign in to the Mac App Store before applying this file.
+# brew bundle --file=Brewfile.mas
+mas "Xcode", id: 497799835
+mas "Developer", id: 640199958

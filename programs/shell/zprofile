@@ -1,0 +1,14 @@
+# Restore package-manager paths after macOS /etc/zprofile runs path_helper.
+if [[ -r /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
+  source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+fi
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+# Runtimes win over dependency runtimes; brew wins over old manual CLIs.
+typeset -U path
+path=("$HOME/.local/share/mise/shims" /opt/homebrew/bin /opt/homebrew/sbin
+      "$HOME/.local/bin" "$HOME/.pub-cache/bin"
+      "$HOME/Library/Android/sdk/platform-tools"
+      "$HOME/Library/Android/sdk/emulator" $path)
+export PATH
