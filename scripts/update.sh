@@ -1,32 +1,11 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+require_platform
+require_commands brew nix
 
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
-log_info() { echo -e "${BLUE}ℹ ${NC}$1"; }
-log_success() { echo -e "${GREEN}✓${NC} $1"; }
-
-echo "Updating dotfiles..."
-
-cd "$HOME/dotfiles"
-
-# Git pull
-log_info "Pulling latest changes from remote..."
-git pull
-
-# Flakeの更新
-log_info "Updating Nix flake inputs..."
-nix flake update
-
-# Home Managerの再適用
-log_info "Applying Home Manager configuration..."
-home-manager switch --flake .
-
-# mise toolsの更新
-log_info "Updating mise tools..."
-mise upgrade
-
-log_success "Update complete!"
+# Update declared applications; runtime pins and flake.lock stay intact.
+bash "$DOTFILES_ROOT/scripts/setup-brew.sh" --upgrade
+apply_home_manager
+bash "$DOTFILES_ROOT/scripts/setup-mise.sh"
+printf '%s\n' 'Update complete. Runtime versions still match programs/mise/config.toml.'

@@ -3,10 +3,10 @@
 {
   programs.git = {
     enable = true;
-    userName = "r0227n";
-    userEmail = "r0227n@users.noreply.github.com";
-
-    extraConfig = {
+    package = null; # Installed by Homebrew.
+    settings = {
+      user.name = "r0227n";
+      user.email = "r0227n@users.noreply.github.com";
       init.defaultBranch = "main";
       pull.rebase = true;
       push.autoSetupRemote = true;
@@ -77,7 +77,7 @@
       ".direnv/"
     ];
 
-    aliases = {
+    settings.alias = {
       st = "status -sb";
       co = "checkout";
       cob = "checkout -b";
@@ -93,20 +93,18 @@
     };
   };
 
-  # GitHub CLI
-  programs.gh = {
-    enable = true;
-    settings = {
-      git_protocol = "ssh";
-      editor = "nvim";
-      prompt = "enabled";
-      pager = "delta";
-    };
+  # Generate settings without installing a second gh through Nix.
+  xdg.configFile."gh/config.yml".source = (pkgs.formats.yaml { }).generate "gh-config.yml" {
+    git_protocol = "ssh";
+    editor = "nvim";
+    prompt = "enabled";
+    pager = "delta";
   };
 
   # lazygit設定
   programs.lazygit = {
     enable = true;
+    package = null;
     settings = {
       gui = {
         theme = {

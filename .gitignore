@@ -1,0 +1,8 @@
+.DS_Store
+.env
+.env.*
+.zshrc.local
+.mise.local.toml
+result
+result-*
+__pycache__/

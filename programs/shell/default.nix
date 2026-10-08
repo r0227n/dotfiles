@@ -1,28 +1,12 @@
 { config, pkgs, lib, ... }:
 
 {
-  programs.zsh = {
-    enable = true;
-    enableCompletion = true;
-    autosuggestion.enable = true;
-    syntaxHighlighting.enable = true;
-
-    # 履歴設定
-    history = {
-      size = 10000;
-      save = 10000;
-      ignoreDups = true;
-      share = true;
-      path = "${config.xdg.dataHome}/zsh/history";
-    };
-
-    # エイリアス
-    shellAliases = {
+  home.shellAliases = {
       # モダンツール
-      ls = "eza --icons";
-      ll = "eza -l --icons --git";
-      la = "eza -la --icons --git";
-      lt = "eza --tree --icons --level=2";
+      ls = "eza --icons=auto";
+      ll = "eza -l --icons=auto --git";
+      la = "eza -la --icons=auto --git";
+      lt = "eza --tree --icons=auto --level=2";
       cat = "bat";
 
       # Git
@@ -39,6 +23,7 @@
       v = "nvim";
       vim = "nvim";
       vi = "nvim";
+      vimdiff = "nvim -d";
 
       # dotfiles管理
       dotfiles = "cd ~/dotfiles";
@@ -57,45 +42,23 @@
       t = "tree";
     };
 
-    # 追加設定
-    initExtra = ''
-      # fzf統合
-      source <(fzf --zsh)
+  # macOS supplies Zsh; Homebrew supplies its plugins and prompt/CLI tools.
+  home.file.".zshenv".text = ''
+    if [ -r "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]; then
+      . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+    fi
+    export ZDOTDIR="$HOME/.config/zsh"
+  '';
 
-      # zoxide統合
-      eval "$(zoxide init zsh)"
+  xdg.configFile."zsh/.zprofile".source = ./zprofile;
+  xdg.configFile."zsh/.zshrc".text =
+    lib.concatStringsSep "\n" (lib.mapAttrsToList
+      (name: value: "alias ${name}=${lib.escapeShellArg value}")
+      config.home.shellAliases)
+    + "\n" + builtins.readFile ./zshrc;
 
-      # 補完設定
-      zstyle ':completion:*' menu select
-      zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
-
-      # キーバインド
-      bindkey "^[[A" history-search-backward
-      bindkey "^[[B" history-search-forward
-
-      # ローカル設定の読み込み（API key等）
-      [ -f ~/.zshrc.local ] && source ~/.zshrc.local
-
-      # 便利な関数
-
-      # プロジェクトディレクトリに移動してmiseを確認
-      function pd() {
-        z "$1" && mise current
-      }
-
-      # mise環境のクリーンインストール
-      function mise-reinstall() {
-        mise uninstall "$1"
-        mise install "$1"
-      }
-    '';
-  };
-
-  # Starship（プロンプト）
-  programs.starship = {
-    enable = true;
-
-    settings = {
+  xdg.configFile."starship.toml".source =
+    (pkgs.formats.toml { }).generate "starship.toml" {
       add_newline = true;
 
       format = lib.concatStrings [
@@ -162,47 +125,9 @@
         format = "took [$duration]($style) ";
       };
     };
-  };
 
-  # fzf設定
-  programs.fzf = {
-    enable = true;
-    enableZshIntegration = true;
-
-    defaultCommand = "fd --type f --hidden --exclude .git";
-    defaultOptions = [
-      "--height 40%"
-      "--layout=reverse"
-      "--border"
-      "--inline-info"
-    ];
-
-    changeDirWidgetCommand = "fd --type d --hidden --exclude .git";
-    changeDirWidgetOptions = [
-      "--preview 'tree -C {} | head -200'"
-    ];
-
-    fileWidgetCommand = "fd --type f --hidden --exclude .git";
-    fileWidgetOptions = [
-      "--preview 'bat --color=always --style=numbers --line-range=:500 {}'"
-    ];
-  };
-
-  # zoxide設定
-  programs.zoxide = {
-    enable = true;
-    enableZshIntegration = true;
-    options = [
-      "--cmd cd"
-    ];
-  };
-
-  # bat設定
-  programs.bat = {
-    enable = true;
-    config = {
-      theme = "TwoDark";
-      style = "numbers,changes,header";
-    };
-  };
+  xdg.configFile."bat/config".text = ''
+    --theme="TwoDark"
+    --style="numbers,changes,header"
+  '';
 }

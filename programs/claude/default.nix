@@ -1,6 +1,7 @@
 { config, pkgs, ... }:
 
 {
+  # Claude Code is installed by Brewfile (cask "claude-code").
   # Claude Code設定ファイル
   home.file.".claude/config.json".text = builtins.toJSON {
     # API設定
@@ -89,11 +90,11 @@
   };
 
   # Zsh統合（エイリアス）
-  programs.zsh.shellAliases = {
+  home.shellAliases = {
     # Claude Code エイリアス
-    claude = "claude-code";
-    cc = "claude-code";
-    ccc = "claude-code chat";
-    ccr = "claude-code --resume";
+    "claude-code" = "claude";
+    cc = "claude";
+    ccc = "claude";
+    ccr = "claude --resume";
   };
 }

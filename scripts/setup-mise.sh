@@ -1,35 +1,16 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+require_platform
+require_commands brew
+MISE_BIN="$(brew --prefix)/bin/mise"
+if [[ ! -x "$MISE_BIN" ]]; then
+  printf '%s\n' 'Install mise with scripts/setup-brew.sh first.' >&2
+  exit 1
+fi
 
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
-log_info() { echo -e "${BLUE}ℹ ${NC}$1"; }
-log_success() { echo -e "${GREEN}✓${NC} $1"; }
-
-log_info "Setting up mise..."
-
-# 設定ディレクトリの作成
-mkdir -p ~/.config/mise
-
-# プラグインのインストール（必要に応じて）
-log_info "Installing mise plugins..."
-
-# よく使うツールのプラグインを追加
-mise plugin install flutter https://github.com/oae/asdf-flutter.git || true
-mise plugin install rust https://github.com/code-lever/asdf-rust.git || true
-mise plugin install nodejs https://github.com/asdf-vm/asdf-nodejs.git || true
-
-log_success "mise setup complete"
-
-echo "
-Available tools for installation:
-  mise install flutter@latest
-  mise install rust@latest
-  mise install node@latest
-
-Or navigate to a project with .mise.toml and run:
-  mise install
-"
+# Use the checked-in defaults even before Home Manager is applied.
+# Run outside the caller's project so its tools/hooks cannot affect setup.
+export MISE_GLOBAL_CONFIG_FILE="$DOTFILES_ROOT/programs/mise/config.toml"
+"$MISE_BIN" --cd "$DOTFILES_ROOT" install
+"$MISE_BIN" --cd "$DOTFILES_ROOT" reshim

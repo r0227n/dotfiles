@@ -11,15 +11,16 @@
     stateHome = "${config.home.homeDirectory}/.local/state";
   };
 
-  # direnv統合
-  programs.direnv = {
-    enable = true;
-    nix-direnv.enable = true;
-    enableZshIntegration = true;
-  };
+  # Keep Flakes enabled for subsequent home-manager/nix commands as well.
+  xdg.configFile."nix/nix.conf".text = ''
+    experimental-features = nix-command flakes
+  '';
 
   # 統合 direnvrc（mise + claude）
   home.file.".config/direnv/direnvrc".text = ''
+    # nix-direnv is not packaged by Homebrew; retain this Nix integration.
+    source ${pkgs.nix-direnv}/share/nix-direnv/direnvrc
+
     # miseとdirenvの統合
     use_mise() {
       eval "$(mise direnv exec)"

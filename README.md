@@ -1,162 +1,115 @@
 # dotfiles
 
-Nix + Home Manager + mise を使った宣言的な開発環境管理
+Apple Silicon macOS 向け。**ランタイムは mise、アプリ・一般 CLI は Homebrew、設定ファイルは Home Manager** で管理します。
 
-## 概要
+## 管理する場所
 
-```
-┌─────────────────────────────────────────────┐
-│              Nix + Home Manager             │
-│  ・システムレベルのツール                      │
-│  ・エディタ、ターミナル、Git等                 │
-│  ・mise本体のインストール                     │
-└─────────────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────┐
-│                   mise                      │
-│  ・Flutter のバージョン管理                   │
-│  ・Rust のバージョン管理                      │
-│  ・Node.js のバージョン管理                   │
-│  ・プロジェクトごとの環境切り替え              │
-└─────────────────────────────────────────────┘
-```
+| 対象 | 定義 |
+| --- | --- |
+| Flutter / Bun / Node.js / Rust / Python / Zig のバージョン | `programs/mise/config.toml` |
+| アプリ、一般 CLI、mise 本体、エディタ、フォント | `Brewfile` |
+| Xcode / Apple Developer（任意） | `Brewfile.mas` |
+| Zsh / Git / Neovim / WezTerm / Claude などの設定 | `home.nix`、`programs/`、`modules/` |
+| Home Manager と Nix 依存関係の固定 | `flake.lock` |
 
-## 構成
+Homebrew にない `nil`（Nix LSP）と `nix-direnv` は Nix に残しています。macOS 標準の Zsh を使用します。
+Brewfile は導入対象を宣言するファイルで、Homebrew の全バージョンを固定するロックファイルではありません。
 
-```
-~/dotfiles/
-├── flake.nix              # Flakes設定（エントリーポイント）
-├── home.nix               # Home Managerメイン設定
-├── modules/
-│   ├── common.nix         # 共通設定（XDG, direnv）
-│   ├── darwin.nix         # macOS専用設定
-│   └── fonts.nix          # Nerd Fonts
-├── programs/
-│   ├── neovim/            # Neovim + AstroVim
-│   ├── wezterm/           # WezTerm設定
-│   ├── shell/             # Zsh + Starship
-│   ├── git/               # Git設定
-│   ├── mise/              # mise設定
-│   └── claude/            # Claude Code設定
-├── scripts/
-│   ├── install.sh         # 初回セットアップ
-│   ├── update.sh          # 更新スクリプト
-│   └── setup-mise.sh      # mise初期設定
-└── README.md
-```
+## 管理対象外
+
+- Hermes / hermes-agent（常駐処理を含む）
+- Appium
+- Deno
+- idb-companion
+- CuaDriver
+- HHKB キーマップ変更ツール
+- Raycast
+
+これらの導入・設定・削除は自動化しません。セットアップや更新は `brew bundle cleanup` を実行しません。
+他ツールの依存として Homebrew が Node.js・Python・Deno などを導入する場合はあります。利用するランタイムは mise の shims を優先します。
 
 ## セットアップ
 
-### 事前準備
+1. Xcode Command Line Tools、[Homebrew](https://brew.sh/)、[Nix](https://nixos.org/download/) を導入してください。
+2. ログインシェルを開き、`brew` と `nix` が PATH 上にあることを確認してください。
+3. このリポジトリを clone し、以下を実行します。
 
 ```bash
-# Nix インストール（未インストールの場合）
-sh <(curl -L https://nixos.org/nix/install) --daemon
-
-# Flakes 有効化
-mkdir -p ~/.config/nix
-echo "experimental-features = nix-command flakes" > ~/.config/nix/nix.conf
-
-# シェル再起動
-exec zsh
+bash scripts/install.sh
+exec zsh -l
 ```
 
-### インストール
+スクリプトは自身の場所からリポジトリを特定するため、別ディレクトリから絶対パスで実行することもできます。
+`flake.nix` のユーザー名は `r0227n`、アーキテクチャは `aarch64-darwin` です。
+別ユーザー向けには、適用前に `flake.nix` のユーザー名を変更してください。
+
+実行順序は以下です。
+
+1. Brewfile の不足パッケージを導入（初回セットアップでは既存パッケージの更新を抑制）。
+2. `flake.lock` で指定した Home Manager から設定を適用。
+3. mise で指定バージョンのランタイムを導入し、shims を更新。
+
+既存の未管理設定ファイルと衝突した場合、Home Manager は `before-dotfiles-日時` を付けてバックアップします。
+アプリへのサインイン、macOS の権限承認、既存アプリの管理元移行については [setup.md](setup.md) を参照してください。
+
+Mac App Store のアプリは、サインイン後に任意で追加します。
 
 ```bash
-# スクリプトで自動セットアップ
-cd ~/dotfiles
-./scripts/install.sh
-
-# または手動で
-nix run home-manager/master -- switch --flake .
+brew bundle --file=Brewfile.mas
 ```
 
-### WezTerm（別途インストール）
+## 更新
 
 ```bash
-brew install --cask wezterm
+# 必要に応じて、先にリポジトリの変更を取り込む
+# git pull --ff-only
+bash scripts/update.sh
 ```
 
-## 日常の使い方
+Brewfile の対象を更新し、Home Manager と mise の設定を再適用します。
+`mise upgrade` や `nix flake update`、自動コミット・ステージングは実行しません。
 
-### 設定の更新
-
-```bash
-# エイリアスを使用
-nixup
-
-# または
-cd ~/dotfiles && home-manager switch --flake .
-```
-
-### flake の更新
+ランタイムを更新するときは `programs/mise/config.toml` を編集してから、次を実行します。
 
 ```bash
-cd ~/dotfiles
-nix flake update
+bash scripts/setup-mise.sh
 home-manager switch --flake .
 ```
 
-### mise でツールを管理
+`mise use --global` は Home Manager 管理下のファイルを書き換えるため使用せず、リポジトリ側を編集します。
+各プロジェクトの `mise.toml` / `.mise.toml` でバージョンを上書きできます。
+Nix の依存関係を更新するときは `nix flake update` を別途実行し、`flake.lock` の差分を確認してください。
+
+## 個別の適用・確認
 
 ```bash
-# ツールのインストール
-mise install flutter@latest
-mise install rust@latest
-mise install node@latest
-
-# プロジェクトで使用するバージョンを指定
-mise use flutter@3.19.0
-
-# 現在のバージョン確認
+bash scripts/setup-brew.sh           # 不足分だけ導入
+bash scripts/setup-brew.sh --upgrade # Brewfile の対象を更新
+bash scripts/setup-mise.sh           # 指定したランタイムを導入
+brew bundle list --file=Brewfile
+brew bundle check --file=Brewfile
 mise current
 ```
 
-## 便利なエイリアス
+セットアップは、管理対象外のアプリや旧インストールを削除しません。既存 mise の追加ツールも残ります。
+旧インストールの shim が Brewfile の CLI を隠す場合の確認方法は [setup.md](setup.md) に記載しています。
 
-| エイリアス | コマンド |
-|-----------|---------|
-| `nixup` | Home Manager 設定を適用 |
-| `nixclean` | Nix ガベージコレクション |
-| `lg` | lazygit |
-| `v` | nvim |
-| `mi` | mise |
-| `mii` | mise install |
-| `mil` | mise list |
-
-## API キーの設定
+## 検証（実機への適用なし）
 
 ```bash
-# ~/.zshrc.local を作成（gitignore対象）
-echo 'export ANTHROPIC_API_KEY="sk-ant-..."' >> ~/.zshrc.local
+python3 -B -m unittest discover -s tests -v
+for script in scripts/*.sh; do bash -n "$script"; done
+zsh -n programs/shell/zshrc
+zsh -n programs/shell/zprofile
+ruby -c Brewfile
+ruby -c Brewfile.mas
+nix build --no-link --no-write-lock-file .#homeConfigurations.r0227n.activationPackage
 ```
 
-## トラブルシューティング
+テストは brew / nix / mise をモックし、実行順序、失敗時の停止、除外対象、バージョン指定の維持を確認します。
+最後のコマンドは設定をビルドしますが、ホームディレクトリへの適用は行いません。
 
-### ロールバック
+## 秘密情報
 
-```bash
-# 前の世代を確認
-home-manager generations
-
-# ロールバック
-home-manager switch --rollback
-```
-
-### キャッシュクリア
-
-```bash
-# Nix
-nix-collect-garbage -d
-
-# mise
-rm -rf ~/.local/share/mise/downloads/*
-```
-
-## 参考リンク
-
-- [Nix](https://nixos.org/)
-- [Home Manager](https://nix-community.github.io/home-manager/)
-- [mise](https://mise.jdx.dev/)
+API キーなどは `~/.zshrc.local` や秘密情報管理ツールで扱います。
+認証トークン、ブラウザプロファイル、会話履歴、DB、キャッシュはこのリポジトリへコピーしません。

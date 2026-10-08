@@ -1,5 +1,5 @@
 {
-  description = "Personal dotfiles with Nix Flakes + mise";
+  description = "Personal dotfiles with Homebrew + mise + Home Manager";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";

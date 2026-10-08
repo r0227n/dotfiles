@@ -19,52 +19,24 @@
 
     # Android SDK パス
     sessionPath = [
+      "$HOME/.local/share/mise/shims"
+      "/opt/homebrew/bin"
+      "/opt/homebrew/sbin"
+      "$HOME/.local/bin"
+      "$HOME/.pub-cache/bin"
       "$HOME/Library/Android/sdk/platform-tools"
       "$HOME/Library/Android/sdk/emulator"
     ];
   };
 
-  # 基本CLIツール（mise管理外）
-  home.packages = with pkgs; [
-    # コアツール
-    curl
-    wget
-    git
-
-    # モダンCLIツール
-    ripgrep       # grep代替 (rg)
-    fd            # find代替
-    bat           # cat代替
-    eza           # ls代替
-    fzf           # ファジーファインダー
-    zoxide        # cd代替 (z)
-    delta         # Git diff viewer
-
-    # ファイル操作
-    tree
-    jq            # JSON processor
-    yq-go         # YAML processor
-
-    # システムモニタリング
-    htop
-    btop
-
-    # Git関連
-    gh            # GitHub CLI
-    lazygit       # Git TUI
-
-    # 開発補助ツール
-    direnv        # プロジェクト環境変数管理
-
-    # その他
-    tldr          # コマンド例集
-  ];
+  # Application binaries are installed by Brewfile; Home Manager owns settings.
+  # nil is not available in Homebrew and remains a Nix-only language server.
+  home.packages = [ pkgs.nil ];
 
   # モジュールのインポート
   imports = [
     ./modules/common.nix
     ./modules/darwin.nix
-    ./modules/fonts.nix
     ./programs/neovim
     ./programs/wezterm
     ./programs/shell
